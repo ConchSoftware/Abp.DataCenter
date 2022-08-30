@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Abp.DataCenter</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Ddd.Domain" Version="5.3.4" />
+    <ProjectReference Include="..\Abp.DataCenter.Domain.Shared\Abp.DataCenter.Domain.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

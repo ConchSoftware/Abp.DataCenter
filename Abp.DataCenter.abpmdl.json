@@ -1,0 +1,79 @@
+{
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {},
+      "host": {}
+    }
+  },
+  "packages": {
+    "Abp.DataCenter.Domain.Shared": {
+      "path": "src/Abp.DataCenter.Domain.Shared/Abp.DataCenter.Domain.Shared.abppkg.json",
+      "folder": "src"
+    },
+    "Abp.DataCenter.Domain": {
+      "path": "src/Abp.DataCenter.Domain/Abp.DataCenter.Domain.abppkg.json",
+      "folder": "src"
+    },
+    "Abp.DataCenter.Application.Contracts": {
+      "path": "src/Abp.DataCenter.Application.Contracts/Abp.DataCenter.Application.Contracts.abppkg.json",
+      "folder": "src"
+    },
+    "Abp.DataCenter.Application": {
+      "path": "src/Abp.DataCenter.Application/Abp.DataCenter.Application.abppkg.json",
+      "folder": "src"
+    },
+    "Abp.DataCenter.EntityFrameworkCore": {
+      "path": "src/Abp.DataCenter.EntityFrameworkCore/Abp.DataCenter.EntityFrameworkCore.abppkg.json",
+      "folder": "src"
+    },
+    "Abp.DataCenter.MongoDB": {
+      "path": "src/Abp.DataCenter.MongoDB/Abp.DataCenter.MongoDB.abppkg.json",
+      "folder": "src"
+    },
+    "Abp.DataCenter.HttpApi": {
+      "path": "src/Abp.DataCenter.HttpApi/Abp.DataCenter.HttpApi.abppkg.json",
+      "folder": "src"
+    },
+    "Abp.DataCenter.HttpApi.Client": {
+      "path": "src/Abp.DataCenter.HttpApi.Client/Abp.DataCenter.HttpApi.Client.abppkg.json",
+      "folder": "src"
+    },
+    "Abp.DataCenter.TestBase": {
+      "path": "test/Abp.DataCenter.TestBase/Abp.DataCenter.TestBase.abppkg.json",
+      "folder": "test"
+    },
+    "Abp.DataCenter.EntityFrameworkCore.Tests": {
+      "path": "test/Abp.DataCenter.EntityFrameworkCore.Tests/Abp.DataCenter.EntityFrameworkCore.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "Abp.DataCenter.MongoDB.Tests": {
+      "path": "test/Abp.DataCenter.MongoDB.Tests/Abp.DataCenter.MongoDB.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "Abp.DataCenter.Domain.Tests": {
+      "path": "test/Abp.DataCenter.Domain.Tests/Abp.DataCenter.Domain.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "Abp.DataCenter.Application.Tests": {
+      "path": "test/Abp.DataCenter.Application.Tests/Abp.DataCenter.Application.Tests.abppkg.json",
+      "folder": "test"
+    },
+    "Abp.DataCenter.HttpApi.Host": {
+      "path": "host/Abp.DataCenter.HttpApi.Host/Abp.DataCenter.HttpApi.Host.abppkg.json",
+      "folder": "host"
+    },
+    "Abp.DataCenter.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/Abp.DataCenter.HttpApi.Client.ConsoleTestApp/Abp.DataCenter.HttpApi.Client.ConsoleTestApp.abppkg.json",
+      "folder": "test"
+    },
+    "Abp.DataCenter.IdentityServer": {
+      "path": "host/Abp.DataCenter.IdentityServer/Abp.DataCenter.IdentityServer.abppkg.json",
+      "folder": "host"
+    },
+    "Abp.DataCenter.Host.Shared": {
+      "path": "host/Abp.DataCenter.Host.Shared/Abp.DataCenter.Host.Shared.abppkg.json",
+      "folder": "host"
+    }
+  }
+}

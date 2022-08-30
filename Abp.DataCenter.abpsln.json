@@ -1,0 +1,7 @@
+{
+  "modules": {
+    "Abp.DataCenter": {
+      "path": "Abp.DataCenter.abpmdl.json"
+    }
+  }
+}
