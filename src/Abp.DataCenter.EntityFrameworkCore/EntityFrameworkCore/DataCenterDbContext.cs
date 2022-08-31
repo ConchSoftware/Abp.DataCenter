@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Abp.DataCenter.Excel;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ public class DataCenterDbContext : AbpDbContext<DataCenterDbContext>, IDataCente
     /* Add DbSet for each Aggregate Root here. Example:
      * public DbSet<Question> Questions { get; set; }
      */
+    public DbSet<ExcelUploadConfigMaster> ExcelUploadConfigMaster { get; set; }
 
     public DataCenterDbContext(DbContextOptions<DataCenterDbContext> options)
         : base(options)

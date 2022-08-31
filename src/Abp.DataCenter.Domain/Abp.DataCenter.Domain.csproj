@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EPPlus" Version="4.5.3.3" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Volo.Abp.Ddd.Domain" Version="5.3.4" />
     <ProjectReference Include="..\Abp.DataCenter.Domain.Shared\Abp.DataCenter.Domain.Shared.csproj" />
   </ItemGroup>

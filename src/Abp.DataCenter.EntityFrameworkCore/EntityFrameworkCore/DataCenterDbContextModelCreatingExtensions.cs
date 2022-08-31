@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Abp.DataCenter.Excel;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 
 namespace Abp.DataCenter.EntityFrameworkCore;
 
@@ -10,24 +12,22 @@ public static class DataCenterDbContextModelCreatingExtensions
     {
         Check.NotNull(builder, nameof(builder));
 
-        /* Configure all entities here. Example:
-
-        builder.Entity<Question>(b =>
+        builder.Entity<ExcelUploadConfigMaster>(b =>
         {
-            //Configure table & schema name
-            b.ToTable(DataCenterDbProperties.DbTablePrefix + "Questions", DataCenterDbProperties.DbSchema);
-
             b.ConfigureByConvention();
 
-            //Properties
-            b.Property(q => q.Title).IsRequired().HasMaxLength(QuestionConsts.MaxTitleLength);
-
-            //Relations
-            b.HasMany(question => question.Tags).WithOne().HasForeignKey(qt => qt.QuestionId);
-
-            //Indexes
-            b.HasIndex(q => q.CreationTime);
+            b.Property(q => q.SheelName).IsRequired().HasMaxLength(64);
+            b.Property(q => q.ConfigName).IsRequired().HasMaxLength(64);
+            b.HasMany(q => q.ExcelUploadConfigItems).WithOne().HasForeignKey(qt => qt.ConfigId);
         });
-        */
+
+        builder.Entity<ExcelUploadConfigItem>(b =>
+        {
+            b.ConfigureByConvention();
+
+            b.Property(q => q.IsRequired).HasDefaultValue(false);
+            b.Property(q => q.ColumnName).IsRequired().HasMaxLength(64);
+            b.Property(q => q.DefaultValue).IsRequired(false).HasMaxLength(128);
+        });
     }
 }

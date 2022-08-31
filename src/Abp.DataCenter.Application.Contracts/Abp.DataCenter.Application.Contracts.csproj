@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Volo.Abp.Ddd.Application.Contracts" Version="5.3.4" />
     <PackageReference Include="Volo.Abp.Authorization" Version="5.3.4" />
     <ProjectReference Include="..\Abp.DataCenter.Domain.Shared\Abp.DataCenter.Domain.Shared.csproj" />
