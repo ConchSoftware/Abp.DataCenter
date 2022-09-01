@@ -10,6 +10,8 @@ namespace Abp.DataCenter.Excel
 {
     public interface IExcelAppService : IApplicationService
     {
-        Task<ListResultDto<object>> ReadStreamAsync(byte[] input, Guid? configId = null);
+        Task<ListResultDto<object>> GetByDataListAsync(byte[] input, Guid? configId = null);
+
+        Task<ExportExcelOutput> GetByListDataAsync(List<dynamic> data, Guid configId);
     }
 }

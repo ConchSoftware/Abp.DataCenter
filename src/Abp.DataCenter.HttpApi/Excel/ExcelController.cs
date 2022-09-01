@@ -1,12 +1,14 @@
 ﻿using Abp.DataCenter.Excel.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.AspNetCore.Mvc;
 
@@ -26,9 +28,9 @@ namespace Abp.DataCenter.Excel
         }
 
         /// <summary>
-        /// Upload Excel File
+        /// 导入文件
         /// </summary>
-        /// <param name="file"></param>
+        /// <param name="file">文件</param>
         /// <returns></returns>
         [HttpPost]
         [Route("upload")]
@@ -40,15 +42,22 @@ namespace Abp.DataCenter.Excel
             await input.File.CopyToAsync(memoryStream);
 
             var data = memoryStream.ToArray();
-            var result = await _excelAppService.ReadStreamAsync(data, input.ConfigId);
+            var result = await _excelAppService.GetByDataListAsync(data, input.ConfigId);
             return result;
         }
 
-        [HttpPost]  
+        /// <summary>
+        /// 导出文件
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        [HttpPost]
         [Route("export")]
-        public async Task<ExportExcelOutput> ExportAsync(object data)
+        public async Task<IActionResult> ExportAsync(ExportExcelInput input)
         {
-            return default;
+            var list = JsonConvert.DeserializeObject<List<dynamic>>(input.Data);
+            var result = await _excelAppService.GetByListDataAsync(list, input.ConfigId);
+            return File(result.Content, result.MimeType, result.FileName);
         }
     }
 }

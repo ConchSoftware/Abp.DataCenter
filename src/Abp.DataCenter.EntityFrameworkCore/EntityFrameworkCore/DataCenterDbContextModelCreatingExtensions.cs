@@ -16,7 +16,7 @@ public static class DataCenterDbContextModelCreatingExtensions
         {
             b.ConfigureByConvention();
 
-            b.Property(q => q.SheelName).IsRequired().HasMaxLength(64);
+            b.Property(q => q.SheetName).IsRequired().HasMaxLength(64);
             b.Property(q => q.ConfigName).IsRequired().HasMaxLength(64);
             b.HasMany(q => q.ExcelUploadConfigItems).WithOne().HasForeignKey(qt => qt.ConfigId);
         });
@@ -28,6 +28,23 @@ public static class DataCenterDbContextModelCreatingExtensions
             b.Property(q => q.IsRequired).HasDefaultValue(false);
             b.Property(q => q.ColumnName).IsRequired().HasMaxLength(64);
             b.Property(q => q.DefaultValue).IsRequired(false).HasMaxLength(128);
+        });
+
+        builder.Entity<ExcelExportConfigMaster>(b =>
+        {
+            b.ConfigureByConvention();
+
+            b.Property(q => q.SheetName).IsRequired().HasMaxLength(64);
+            b.Property(q => q.FileName).IsRequired().HasMaxLength(64);
+            b.HasMany(q => q.ExcelExportConfigItems).WithOne().HasForeignKey(qt => qt.ConfigId);
+        });
+
+        builder.Entity<ExcelExportConfigItem>(b =>
+        {
+            b.ConfigureByConvention();
+
+            b.Property(q => q.FieldName).IsRequired().HasMaxLength(64);
+            b.Property(q => q.ColumnName).IsRequired(false).HasMaxLength(64);
         });
     }
 }

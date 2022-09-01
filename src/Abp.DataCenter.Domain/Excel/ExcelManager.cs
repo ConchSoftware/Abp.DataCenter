@@ -1,11 +1,15 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.RefAndLookup;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
+using OfficeOpenXml.Style;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
@@ -18,10 +22,12 @@ namespace Abp.DataCenter.Excel
     public class ExcelManager: DomainService, IExcelManager
     {
         private readonly IExcelUploadConfigRepository _excelUploadConfigRepository;
+        private readonly IExcelExportConfigRepository _excelExportConfigRepository;
 
-        public ExcelManager(IExcelUploadConfigRepository uploadConfig)
+        public ExcelManager(IExcelUploadConfigRepository uploadConfig, IExcelExportConfigRepository excelExportConfigRepository)
         {
             _excelUploadConfigRepository = uploadConfig;
+            _excelExportConfigRepository = excelExportConfigRepository;
         }
 
         /// <summary>
@@ -30,7 +36,7 @@ namespace Abp.DataCenter.Excel
         /// <param name="memoryStream"></param>
         /// <param name="configId"></param>
         /// <returns></returns>
-        public async Task<List<dynamic>> ReadStreamAsync(byte[] file, Guid configId)
+        public async Task<List<dynamic>> GetByDataListAsync(byte[] file, Guid configId)
         {
             if (configId == null)
             {
@@ -50,7 +56,7 @@ namespace Abp.DataCenter.Excel
             }
 
             using var package = new ExcelPackage(ms);
-            var worksheet = package.Workbook.Worksheets[configData.SheelName];
+            var worksheet = package.Workbook.Worksheets[configData.SheetName];
             Check.NotNull(worksheet, nameof(ExcelManager));
 
             var sc = worksheet.Dimension.Start.Column;
@@ -92,7 +98,7 @@ namespace Abp.DataCenter.Excel
         /// <param name="memoryStream"></param>
         /// <param name="configId"></param>
         /// <returns></returns>
-        public List<dynamic> ReadStream(byte[] file)
+        public List<dynamic> GetByDataList(byte[] file)
         {
             Check.NotNull(file, nameof(ExcelManager));
 
@@ -123,6 +129,161 @@ namespace Abp.DataCenter.Excel
                 }
             }
 
+            return result;
+        }
+
+        public async Task<ExportExcelOutput> GetByListDataAsync(List<object> data, Guid configId)
+        {
+            var configdata = new ExcelExportConfigMaster(GuidGenerator.Create(), "员工信息导出", "员工信息", true, ExcelExportConfigTypeEnum.xlsx);
+            configdata.AddItems("name", "员工姓名", ExcelColumnType.String, 120, 1);
+            configdata.AddItems("age", "员工年龄", ExcelColumnType.String, 60, 2);
+            configdata.AddItems("area", "个人爱好", ExcelColumnType.String, 200, 3);
+            await _excelExportConfigRepository.InsertAsync(configdata);
+
+            var exportData = ListToDataTable(data);
+            var config = await _excelExportConfigRepository.GetByIdAsync(configId);
+            var result = ExportDataTableExcel(exportData, config);
+            return new ExportExcelOutput()
+            {
+                Content = result,
+                FileName = config.FileName,
+                MimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            };
+        }
+
+        /// <summary>
+        /// 导出Excel
+        /// </summary>
+        /// <param name="dataTable">数据源</param>
+        /// <param name="heading">工作簿Worksheet</param>
+        /// <param name="showSrNo">//是否显示行编号</param>
+        /// <param name="config">要导出的列</param>
+        /// <returns></returns>
+        private byte[] ExportDataTableExcel(DataTable dataTable, ExcelExportConfigMaster config = null)
+        {
+            byte[] result;
+            using (ExcelPackage package = new ExcelPackage())
+            {
+                ExcelWorksheet workSheet = package.Workbook.Worksheets.Add($"{config.SheetName}");
+                int startRowFrom = 1;  // 开始的行
+                // 是否显示行编号
+                if (config.ShowRowNo)
+                {
+                    DataColumn dataColumn = dataTable.Columns.Add("#", typeof(int));
+                    dataColumn.SetOrdinal(0);
+                    int index = 1;
+                    foreach (DataRow item in dataTable.Rows)
+                    {
+                        item[0] = index;
+                        index++;
+                    }
+                }
+                workSheet.Cells["A" + startRowFrom].LoadFromDataTable(dataTable, true);
+                int columnIndex = 1;
+                foreach (DataColumn item in dataTable.Columns)
+                {
+                    ExcelRange columnCells = workSheet.Cells[workSheet.Dimension.Start.Row, columnIndex, workSheet.Dimension.End.Row, columnIndex];
+                    int maxLength = columnCells.Max(cell => cell.Value != null ? cell.Value.ToString().Count() : 0);
+                    if (maxLength < 150)
+                    {
+                        workSheet.Column(columnIndex).AutoFit();
+                    }
+                    columnIndex++;
+                }
+
+                using (ExcelRange r = workSheet.Cells[startRowFrom, 1, startRowFrom, dataTable.Columns.Count])
+                {
+                    r.Style.Font.Color.SetColor(System.Drawing.Color.White);
+                    r.Style.Font.Bold = true;
+                    r.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    r.Style.Fill.BackgroundColor.SetColor(System.Drawing.ColorTranslator.FromHtml("#708090"));
+                }
+
+                if (dataTable.Rows.Count > 0)
+                {
+                    // format cells - add borders 
+                    using (ExcelRange r = workSheet.Cells[startRowFrom + 1, 1, startRowFrom + dataTable.Rows.Count, dataTable.Columns.Count])
+                    {
+                        r.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                        r.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                        r.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                        r.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                        r.Style.Border.Top.Color.SetColor(System.Drawing.Color.Black);
+                        r.Style.Border.Bottom.Color.SetColor(System.Drawing.Color.Black);
+                        r.Style.Border.Left.Color.SetColor(System.Drawing.Color.Black);
+                        r.Style.Border.Right.Color.SetColor(System.Drawing.Color.Black);
+                    }
+                }
+
+                if (config != null)
+                {
+                    var list = new List<int>();
+                    for (int i = dataTable.Columns.Count - 1; i >= 0; i--)
+                    {
+                        if (i == 0 && config.ShowRowNo)
+                        {
+                            continue;
+                        }
+                        if (!config.ExcelExportConfigItems.Any(c => c.ColumnName.ToUpper() == dataTable.Columns[i].ColumnName.ToUpper()))
+                        {
+                            workSheet.DeleteColumn(i + 1);
+                        }
+                        else
+                        {
+                            // 设置单元格别名
+                            var data = config.ExcelExportConfigItems.FirstOrDefault(c => c.FieldName.ToUpper() == dataTable.Columns[i].ColumnName.ToUpper());
+                            workSheet.Cells[1, i + 1].Value = data.ColumnName ?? data.FieldName;
+                            if (data.Type == ExcelColumnType.Datetime)
+                            {
+                                workSheet.Column(i + 1).Style.Numberformat.Format = "yyyy-MM-dd";
+                            }
+                            if (data.Width.HasValue)
+                            {
+                                workSheet.Column(i + 1).Width = data.Width.Value;
+                            }
+                        }
+                    }
+                }
+
+                result = package.GetAsByteArray();
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// List转换成DataTable
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private DataTable ListToDataTable(IList list)
+        {
+            DataTable result = new DataTable();
+            if (list.Count > 0)
+            {
+                PropertyInfo[] propertys = list[0].GetType().GetProperties();
+                foreach (PropertyInfo pi in propertys)
+                {
+                    //获取类型
+                    Type colType = pi.PropertyType;
+                    //当类型为Nullable<>时
+                    if ((colType.IsGenericType) && (colType.GetGenericTypeDefinition() == typeof(Nullable<>)))
+                    {
+                        colType = colType.GetGenericArguments()[0];
+                    }
+                    result.Columns.Add(pi.Name, colType);
+                }
+                for (int i = 0; i < list.Count; i++)
+                {
+                    ArrayList tempList = new ArrayList();
+                    foreach (PropertyInfo pi in propertys)
+                    {
+                        object obj = pi.GetValue(list[i], null);
+                        tempList.Add(obj);
+                    }
+                    object[] array = tempList.ToArray();
+                    result.LoadDataRow(array, true);
+                }
+            }
             return result;
         }
     }

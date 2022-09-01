@@ -6,6 +6,10 @@ namespace Abp.DataCenter.Excel
 {
     public class ExportExcelOutput
     {
-        public string Url { get; set; }
+        public byte[] Content { get; set; }
+
+        public string MimeType { get; set; }
+
+        public string FileName { get; set; }
     }
 }

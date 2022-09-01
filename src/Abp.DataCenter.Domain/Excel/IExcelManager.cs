@@ -9,8 +9,10 @@ namespace Abp.DataCenter.Excel
 {
     public interface IExcelManager : IDomainService
     {
-        List<dynamic> ReadStream(byte[] memoryStream);
+        List<dynamic> GetByDataList(byte[] input);
 
-        Task<List<dynamic>> ReadStreamAsync(byte[] memoryStream, Guid configId);
+        Task<List<dynamic>> GetByDataListAsync(byte[] input, Guid configId);
+
+        Task<ExportExcelOutput> GetByListDataAsync(List<object> data, Guid configId);
     }
 }

@@ -6,28 +6,18 @@ using Volo.Abp.Domain.Entities;
 
 namespace Abp.DataCenter.Excel
 {
-    public class ExcelUploadConfigItem : Entity<int>, IAuditedObject
+    public class ExcelExportConfigItem : Entity<int>, IAuditedObject
     {
         public Guid ConfigId { get; set; }
 
-        /// <summary>
-        /// Excel列名
-        /// </summary>
+        public string FieldName { get; set; }
+
         public string ColumnName { get; set; }
 
-        /// <summary>
-        /// 如果为空的默认值
-        /// </summary>
-        public string DefaultValue { get; set; }
+        public ExcelColumnType Type { get; set; }
 
-        /// <summary>
-        /// 是否必填，如果为空则跳过导入行
-        /// </summary>
-        public bool IsRequired { get; set; }
+        public int? Width { get; set; }
 
-        /// <summary>
-        /// 排序号
-        /// </summary>
         public int OrderNo { get; set; }
 
         public DateTime CreationTime { get; set; }
@@ -38,12 +28,14 @@ namespace Abp.DataCenter.Excel
 
         public DateTime? LastModificationTime { get; set; }
 
-        public ExcelUploadConfigItem(Guid configId, string columnName, string defaultValue, bool isRequired, int orderNo, Guid? creatorId = null)
+        public ExcelExportConfigItem(Guid configId, string fieldName, string columnName, ExcelColumnType type, 
+            int? width, int orderNo, Guid? creatorId = null)
         {
             ConfigId = configId;
+            FieldName = fieldName;
             ColumnName = columnName;
-            DefaultValue = defaultValue;
-            IsRequired = isRequired;
+            Type = type;
+            Width = width;
             OrderNo = orderNo;
             CreationTime = DateTime.Now;
             CreatorId = creatorId;

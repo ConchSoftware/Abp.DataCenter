@@ -17,10 +17,15 @@ namespace Abp.DataCenter.Excel
             _excelManager = excelManager;
         }
 
-        public async Task<ListResultDto<dynamic>> ReadStreamAsync(byte[] input, Guid? configId = null)
+        public async Task<ExportExcelOutput> GetByListDataAsync(List<dynamic> data, Guid configId)
+        {
+            return await _excelManager.GetByListDataAsync(data, configId);
+        }
+
+        public async Task<ListResultDto<dynamic>> GetByDataListAsync(byte[] input, Guid? configId = null)
         {
             var result = configId.HasValue ? 
-                await _excelManager.ReadStreamAsync(input, configId.Value) : _excelManager.ReadStream(input);
+                await _excelManager.GetByDataListAsync(input, configId.Value) : _excelManager.GetByDataList(input);
 
             return new ListResultDto<dynamic>(result);
         }
