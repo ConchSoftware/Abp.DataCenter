@@ -17,6 +17,6 @@ namespace Abp.DataCenter.Excel.Dtos
         /// <summary>
         /// 配置ID
         /// </summary>
-        public Guid ConfigId { get; set; }
+        public Guid? ConfigId { get; set; }
     }
 }

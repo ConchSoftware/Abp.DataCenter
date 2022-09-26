@@ -13,6 +13,6 @@ namespace Abp.DataCenter.Excel
 
         Task<List<dynamic>> GetByDataListAsync(byte[] input, Guid configId);
 
-        Task<ExportExcelOutput> GetByListDataAsync(List<object> data, Guid configId);
+        Task<ExportExcelOutput> GetByListDataAsync(List<object> data, Guid? configId);
     }
 }

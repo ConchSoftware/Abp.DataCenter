@@ -104,7 +104,7 @@ namespace Abp.DataCenter.Excel
 
             using var ms = new MemoryStream(file);
             using var package = new ExcelPackage(ms);
-            var worksheet = package.Workbook.Worksheets["Sheet1"];
+            var worksheet = package.Workbook.Worksheets.FirstOrDefault();
             Check.NotNull(worksheet, nameof(ExcelManager));
             var sc = worksheet.Dimension.Start.Column;
             var ec = worksheet.Dimension.End.Column;
@@ -132,16 +132,16 @@ namespace Abp.DataCenter.Excel
             return result;
         }
 
-        public async Task<ExportExcelOutput> GetByListDataAsync(List<object> data, Guid configId)
+        public async Task<ExportExcelOutput> GetByListDataAsync(List<object> data, Guid? configId)
         {
             var configdata = new ExcelExportConfigMaster(GuidGenerator.Create(), "员工信息导出", "员工信息", true, ExcelExportConfigTypeEnum.xlsx);
             configdata.AddItems("name", "员工姓名", ExcelColumnType.String, 120, 1);
             configdata.AddItems("age", "员工年龄", ExcelColumnType.String, 60, 2);
             configdata.AddItems("area", "个人爱好", ExcelColumnType.String, 200, 3);
-            await _excelExportConfigRepository.InsertAsync(configdata);
+            configdata = await _excelExportConfigRepository.InsertAsync(configdata);
 
             var exportData = ListToDataTable(data);
-            var config = await _excelExportConfigRepository.GetByIdAsync(configId);
+            var config = await _excelExportConfigRepository.GetByIdAsync(configId ?? configdata.Id);
             var result = ExportDataTableExcel(exportData, config);
             return new ExportExcelOutput()
             {
@@ -255,12 +255,13 @@ namespace Abp.DataCenter.Excel
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        private DataTable ListToDataTable(IList list)
+        private DataTable ListToDataTable<T>(IList<T> list)
         {
             DataTable result = new DataTable();
             if (list.Count > 0)
             {
-                PropertyInfo[] propertys = list[0].GetType().GetProperties();
+                T ss = list[0];
+                PropertyInfo[] propertys = ss.GetType().GetProperties();
                 foreach (PropertyInfo pi in propertys)
                 {
                     //获取类型
